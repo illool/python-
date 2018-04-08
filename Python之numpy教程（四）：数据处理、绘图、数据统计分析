@@ -1,0 +1,281 @@
+1.用数组表达式代替循环的方法，通常被称为矢量化。
+
+[python] view plain copy
+
+    points = np.arange(-5,5,0.01) # 1000个间隔相等的点  
+
+用np.meshgrid函数接受两个一维数组，并产生两个二维矩阵。
+
+[python] view plain copy
+
+    xs, ys = np.meshgrid(points,points)  
+
+[python] view plain copy
+
+    xs  
+
+输出：
+
+array([[-5.  , -4.99, -4.98, ...,  4.97,  4.98,  4.99],
+       [-5.  , -4.99, -4.98, ...,  4.97,  4.98,  4.99],
+       [-5.  , -4.99, -4.98, ...,  4.97,  4.98,  4.99],
+       ..., 
+       [-5.  , -4.99, -4.98, ...,  4.97,  4.98,  4.99],
+       [-5.  , -4.99, -4.98, ...,  4.97,  4.98,  4.99],
+       [-5.  , -4.99, -4.98, ...,  4.97,  4.98,  4.99]])
+
+[python] view plain copy
+
+    ys  
+
+输出：
+
+array([[-5.  , -5.  , -5.  , ..., -5.  , -5.  , -5.  ],
+       [-4.99, -4.99, -4.99, ..., -4.99, -4.99, -4.99],
+       [-4.98, -4.98, -4.98, ..., -4.98, -4.98, -4.98],
+       ..., 
+       [ 4.97,  4.97,  4.97, ...,  4.97,  4.97,  4.97],
+       [ 4.98,  4.98,  4.98, ...,  4.98,  4.98,  4.98],
+       [ 4.99,  4.99,  4.99, ...,  4.99,  4.99,  4.99]])
+
+
+2.加载matplotlib.pyplot
+
+[python] view plain copy
+
+    import matplotlib.pyplot as plt  
+
+[python] view plain copy
+
+    z = np.sqrt(xs ** 2 + ys ** 2)  
+    z  
+
+输出：
+
+array([[ 7.07106781,  7.06400028,  7.05693985, ...,  7.04988652,
+         7.05693985,  7.06400028],
+       [ 7.06400028,  7.05692568,  7.04985815, ...,  7.04279774,
+         7.04985815,  7.05692568],
+       [ 7.05693985,  7.04985815,  7.04278354, ...,  7.03571603,
+         7.04278354,  7.04985815],
+       ..., 
+       [ 7.04988652,  7.04279774,  7.03571603, ...,  7.0286414 ,
+         7.03571603,  7.04279774],
+       [ 7.05693985,  7.04985815,  7.04278354, ...,  7.03571603,
+         7.04278354,  7.04985815],
+       [ 7.06400028,  7.05692568,  7.04985815, ...,  7.04279774,
+         7.04985815,  7.05692568]])
+
+[python] view plain copy
+
+    plt.imshow(z,cmap=plt.cm.gray); plt.colorbar()；plt.colorbar()  
+
+输出：
+
+<matplotlib.colorbar.Colorbar at 0x89754e0>
+
+[python] view plain copy
+
+    plt.title("Image plot of $\sqrt{x^2 + y^2}$ for a grid of values")  
+
+输出：
+
+<matplotlib.text.Text at 0x88b3b38>
+
+[python] view plain copy
+
+    plt.show()  
+
+输出：
+
+
+3.将条件逻辑表述为数组运算
+
+[python] view plain copy
+
+    xarr = np.array([1.1,1.2,1.3,1.4,1.5])  
+    yarr = np.array([2.1,2.2,2.3,2.4,2.5])  
+    cond = np.array([True,False,True,True,False])  
+
+假设我们想要根据cond中的值选取xarr和yarr的值：当cond中的值为True时，选取xarr的值，否则从yarr中选取。
+[python] view plain copy
+
+    result = [(x if c else y) for x,y,c in zip(xarr,yarr,cond)]  
+    result  
+
+输出：（如果输出没显示要观点刚才打开的图片）
+
+[1.1000000000000001, 2.2000000000000002, 1.3, 1.3999999999999999, 2.5]
+
+
+4.上面这个运算对于大型数据比较慢，并且无法应用于多维数组，故应该使用np.where函数
+[python] view plain copy
+
+    result = np.where(cond,xarr,yarr)  
+    result  
+
+输出：
+
+array([ 1.1,  2.2,  1.3,  1.4,  2.5])
+
+
+5.加入有一个随机数据组成的矩阵，你希望将所有正值替换成2，所有负值替换成-2，用np.where会非常简单
+
+[python] view plain copy
+
+    arr = np.random.randn(4,4)  
+    arr  
+
+输出：
+
+array([[ 0.78489047,  1.88085112,  0.89365585, -0.62922182],
+       [-2.22704018, -1.28114089, -0.40562419,  1.18623359],
+       [ 0.542143  ,  0.59539364, -0.5461755 , -0.06922852],
+       [-0.41098528, -0.69934786,  0.45631505, -0.43576076]])
+
+[python] view plain copy
+
+    np.where(arr > 0, 2, -2)  
+
+输出：
+
+array([[ 2,  2,  2, -2],
+       [-2, -2, -2,  2],
+       [ 2,  2, -2, -2],
+       [-2, -2,  2, -2]])
+
+[python] view plain copy
+
+    np.where(arr > 0, 2, arr) #只将正值设为2  
+
+输出：
+
+array([[ 2.        ,  2.        ,  2.        , -0.62922182],
+       [-2.22704018, -1.28114089, -0.40562419,  2.        ],
+       [ 2.        ,  2.        , -0.5461755 , -0.06922852],
+       [-0.41098528, -0.69934786,  2.        , -0.43576076]])
+
+
+6.np.where可以嵌套使用
+
+[python] view plain copy
+
+    cond1 = np.array([True,False,True,True,False])  
+    cond2 = np.array([True,True,True,False,False])  
+
+[python] view plain copy
+
+    np.where(cond1 & cond2, 0 ,np.where(cond1,1,np.where(cond2,2,3)))  
+
+输出：
+
+array([0, 2, 0, 1, 3])
+
+
+7.还可以写成下面的算术运算
+
+[python] view plain copy
+
+    result = 1 * (cond1 - cond2) + 2 * (cond2 &-cond1) + 3 * -(cond1|cond2)   
+    result  
+
+输出：
+
+array([0, 3, 0, 1, 3])
+
+
+8.对整个数组进行统计分析：
+
+[python] view plain copy
+
+    arr = np.random.randn(5,4)  
+    arr  
+
+输出：
+
+array([[ 2.17899918, -0.22836752,  1.21644223, -0.54345959],
+       [ 0.15218725,  1.54221418,  0.23328303, -0.68457268],
+       [-1.29245448,  1.31485277,  1.6012457 ,  0.42838336],
+       [-1.9432406 ,  0.65208302,  1.30286658,  0.23783384],
+       [-0.7175733 , -1.10462752,  1.16894871,  0.94568677]])
+
+[python] view plain copy
+
+    arr.mean()  
+
+输出：
+
+0.32303654650298108
+
+[python] view plain copy
+
+    np.mean(arr)  
+
+输出：
+
+0.32303654650298108
+
+[python] view plain copy
+
+    arr.sum()  
+
+输出：
+
+6.4607309300596221
+
+
+9.mean和sum这类函数可以接收一个axis参数，计算每行或者每列的数据信息，axis取0是按列，取1是按行。
+
+[python] view plain copy
+
+    arr.mean(axis=1)  
+
+输出：(每一行的均值）
+
+array([ 0.65590357,  0.31077795,  0.51300684,  0.06238571,  0.07310866])
+
+
+[python] view plain copy
+
+    arr.sum(0)  
+
+输出：（每一列的总值）
+
+array([-1.62208196,  2.17615492,  5.52278626,  0.38387171])
+
+
+10.cumsum和cumprod函数，累加和类乘函数。
+[python] view plain copy
+
+    arr = np.array([[0,1,2],[3,4,5],[6,7,8]])  
+    arr  
+
+输出：
+
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+
+[python] view plain copy
+
+    arr.cumsum(0)  
+
+输出：
+
+array([[ 0,  1,  2],
+       [ 3,  5,  7],
+       [ 9, 12, 15]], dtype=int32)
+
+[python] view plain copy
+
+    arr.cumprod(1)  
+
+输出：
+
+array([[  0,   0,   0],
+       [  3,  12,  60],
+       [  6,  42, 336]], dtype=int32)
+
+
+11.基本数组统计方法总结如下：
+
