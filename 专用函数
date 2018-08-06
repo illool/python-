@@ -1,0 +1,119 @@
+排序：
+回到顶部
+numpy.lexsort():
+numpy.lexsort()是个排字典序函数，因为很有意思，感觉也蛮有用的，所以单独列出来讲一下：
+
+强调一点，本函数只接受一个参数！
+
+复制代码
+1 import numpy as np
+2 
+3 a = np.array([1,2,3,4,5])
+4 b = np.array([50,40,30,20,10])
+5 
+6 c = np.lexsort((a,b))
+7 print(list(zip(a[c],b[c])))
+复制代码
+[(5, 10), (4, 20), (3, 30), (2, 40), (1, 50)]
+ 这是一个间接排序函数，会优先使用后面列排序，后面一样才使用前面的列排序，测试如下：
+
+1 a = np.array([1,2,3,4,5])
+2 b = np.array([40,40,30,20,10])
+3 
+4 c = np.lexsort((a,b))
+5 print(list(zip(a[c],b[c])))
+[(5, 10), (4, 20), (3, 30), (1, 40), (2, 40)]
+ 交换次序：
+
+1 a,b = b,a
+2 
+3 c = np.lexsort((a,b))
+4 print(list(zip(a[c],b[c])))
+[(40, 1), (40, 2), (30, 3), (20, 4), (10, 5)]
+ 而且可以按照此规则进行多列排序（大于2个）：
+
+1 a = np.array([1,2,3,4,5])
+2 b = np.array([50,30,40,20,10])
+3 d = np.array([400,300,300,100,200])
+4 
+5 c = np.lexsort((a,b,d))
+6 print(list(zip(a[c],b[c],d[c])))
+1
+[(4, 20, 100), (5, 10, 200), (2, 30, 300), (3, 40, 300), (1, 50, 400)]
+回到顶部
+ numpy中的几种排序手段：
+numpy.sort()           正常排序
+
+numpy.msort()        正常排序，定死axis=0
+
+Notes
+    -----
+    ``np.msort(a)`` is equivalent to  ``np.sort(a, axis=0)``.
+array.sort()              原地排序，无return
+
+numpy.argsort()       间接排序
+
+numpy.lexsort()        间接排序，字典序
+
+numpy.sort_complex()      复数排序，先实部后虚部
+
+1 np.random.seed(42)
+2 complex_number = np.random.random(5) + np.random.random(5)*1j
+3 print(complex_number)
+4 print(np.sort_complex(complex_number)) # 复数排序，先实后虚
+[ 0.37454012+0.15599452j  0.95071431+0.05808361j  0.73199394+0.86617615j
+  0.59865848+0.60111501j  0.15601864+0.70807258j]
+[ 0.15601864+0.70807258j  0.37454012+0.15599452j  0.59865848+0.60111501j
+  0.73199394+0.86617615j  0.95071431+0.05808361j]
+ 
+
+ 索引：
+np.argmax(a)              最大值索引
+
+np.nanargmin(b)         忽略nan的最小值索引
+
+np.argwhere(a<=4)     符合条件的索引
+
+1 a = np.array([2,4,8])
+2 print(np.argmax(a))
+3 b = np.array([np.nan,2,4])
+4 print(np.nanargmin(b))
+5 c = np.array([2,4,8])
+6 print(np.argwhere(a<=4))
+2
+1
+[[0]
+ [1]]
+ 
+
+np.searchsorted(a,[-2,7])
+
+np.insert(a,indices,[-2,7])
+
+1 a = np.arange(5)
+2 indices = np.searchsorted(a,[-2,7])   # 返回向有序数组中插入，不改变有序性的索引
+3 print(indices)
+4 print(np.insert(a,indices,[-2,7]))    # 插入函数{目标数组，插入索引，插入数组}
+[0 5]
+[-2  0  1  2  3  4  7]
+ 
+
+ 抽取：
+np.extract(condition,a)
+
+np.where(a%2==0)
+
+np.nonzero(a)
+
+1 a = np.arange(7)
+2 condition = (a%2)==0
+3 print(a[a%2==0])                   # 使用布尔索引
+4 print(np.extract(condition,a))     # 使用np.extract()
+5 print(np.where(a%2==0))            # 使用np.where()
+6 print(np.nonzero(a))               # 提取非零元素
+[0 2 4 6]
+[0 2 4 6]
+(array([0, 2, 4, 6]),)
+(array([1, 2, 3, 4, 5, 6]),)
+ 后记：
+由于书中本章后面的内容偏向金融等专用领域，而我一来暂时还没有去金融公司的打算，二来学习本书目的是为后续的机器学习包（sklearn）和数据处理相关方向打好基础，所以对应原书7.9节之后暂时不会学习了，下一节会从第九章的matplotlib绘图开始，在第十章scipy之后结束，同样的，第十章之后的pygame应该也不会系统的学习了。补充一句，scipy还可能会在之后的机器学习系列中有所涉及（毕竟是面向科学计算的包）。
